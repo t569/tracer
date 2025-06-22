@@ -2,6 +2,11 @@ use std::fs::File;
 use std::io::Write;
 
 pub mod core;
+pub mod color;
+pub mod ray;
+
+pub use core::Vec3;
+pub use color::write_color;
 
 pub fn write_to_file(filename: &str, data: &str) {
     let mut file = File::create(filename).expect("Unable to create file");

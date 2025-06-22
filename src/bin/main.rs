@@ -1,5 +1,6 @@
 use tracer::write_to_file;
 use tracer::core::Vec3;
+use tracer::color::write_color;
 fn main() {
     
     // image
@@ -22,12 +23,14 @@ fn main() {
         println!("Progress: {}/{}", i, image_height);
 
         for j in 0..image_width{
-            // Generate a pixel value based on its position
-            let r = ((i as f32 / image_height as f32) * 255.0) as u8;
-            let g = ((j as f32 / image_width as f32) * 255.0) as u8;
-            let b = 0.0 as u8; // No blue component
-                    
-            image_data.push_str(&format!("{} {} {} ", r, g, b));
+            // // Generate a pixel value based on its position
+            // let r = ((i as f32 / image_height as f32) * 255.0) as u8;
+            // let g = ((j as f32 / image_width as f32) * 255.0) as u8;
+            // let b = (0.0 * 255.0) as u8; // No blue component
+            let r = i / (image_width - 1);
+            let g = j / (image_height - 1);
+            let pixel_color = Vec3::new(r as f32, g as f32, 0.0);
+            image_data.push_str(&write_color(&pixel_color, 1));
 
         }
     }
