@@ -1,6 +1,5 @@
-use std::fs::File;
-use std::io::Write;
-
+use tracer::write_to_file;
+use tracer::core::Vec3;
 fn main() {
     
     // image
@@ -18,6 +17,10 @@ fn main() {
     image_data.push_str("255\n");
 
     for i in 0..image_height{
+
+        // show the progress in the grip rendering
+        println!("Progress: {}/{}", i, image_height);
+
         for j in 0..image_width{
             // Generate a pixel value based on its position
             let r = ((i as f32 / image_height as f32) * 255.0) as u8;
@@ -28,15 +31,8 @@ fn main() {
 
         }
     }
-
+    println!("Rendering complete, writing to file...");
     write_to_file("renders/image.ppm", &image_data);
 
 }
 
-
-fn write_to_file(filename: &str, data: &str) {
-    let mut file = File::create(filename).expect("Unable to create file");
-    file.write_all(data.as_bytes()).expect("Unable to write data");
-
-
-}
