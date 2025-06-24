@@ -24,7 +24,7 @@ impl<T> Vec3<T> {
     }
 }
 
-impl<T: Default> Default for Vec3<T> {
+impl<T: Default> Vec3<T> {
     fn default() -> Self {
         Vec3 {
             x: T::default(),
@@ -34,7 +34,14 @@ impl<T: Default> Default for Vec3<T> {
     }
 }
 
+
+// this is a redefinition of the Add trait for Vec3
+// that is why it is written as std::ops::Add
+
 impl<T: std::ops::Add<Output = T>> std::ops::Add for Vec3<T> {
+
+    // to implement the Add trait, we need to specify the Output type
+    // which is the same type as the Vec3 we are adding
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
@@ -49,6 +56,9 @@ impl<T: std::ops::Add<Output = T>> std::ops::Add for Vec3<T> {
 
 // this is to compensate for the fact that we want to add two references to Vec3
 // and we do not want to move the original Vec3
+
+// this also means T supports the Add trait
+// lets define the Add trait for a reference to Vec3
 impl<T: std::ops::Add<Output = T> + Copy> std::ops::Add for &Vec3<T> {
     type Output = Vec3<T>;
 
@@ -60,6 +70,8 @@ impl<T: std::ops::Add<Output = T> + Copy> std::ops::Add for &Vec3<T> {
         }
     }
 }
+
+// this properly implements += and makes sure the type T implements AddAssign(+=)
 
 impl<T: std::ops::AddAssign<T> + Copy> std::ops::AddAssign for Vec3<T> {
     // mutable borrow of self to preserve the original Vec3
@@ -217,8 +229,8 @@ impl<T: PartialEq> PartialEq for Vec3<T> {
     }
 }
 
-impl Vec3<f32> {
-    pub fn mag(&self) -> f32 {
+impl Vec3<f64> {
+    pub fn mag(&self) -> f64 {
         (self.x * self.x + self.y * self.y + self.z * self.z).sqrt()
     }
 
@@ -235,7 +247,7 @@ impl Vec3<f32> {
         }
     }
 
-    pub fn dot(&self, other: &Self) -> f32 {
+    pub fn dot(&self, other: &Self) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
@@ -268,5 +280,20 @@ impl Vec3<f32> {
         }
     }
 
+
+}
+
+
+// the junk code lives!!!
+impl std::ops::Mul<Vec3<f64>> for f64{
+    type Output = Vec3<f64>;
+
+    fn mul(self, other: Vec3<f64>) -> Vec3<f64> {
+        Vec3 {
+            x: self as f64 * other.x,
+            y: self as f64 * other.y,
+            z: self as f64 * other.z,
+        }
+    }
 
 }
