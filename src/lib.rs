@@ -18,8 +18,11 @@ pub fn ray_color(ray: &Ray) -> Vec3<f64> {
     // Simple ray color function that returns a gradient based on the ray's direction
     let centre = Vec3::new(0.0, 0.0, -1.0);
 
-    if hit_sphere(&centre, 0.5, ray){
-        return Vec3::new(1.0, 0.0, 0.0); // Red color if the ray hits the sphere
+    let t = hit_sphere(&centre, 0.5, ray);
+
+    if t > 0.0{
+        let normal = (ray.at(t) - centre).normalize();
+        return 0.5 * Vec3::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
     }
 
     let unit_direction = ray.direction().normalize();
@@ -33,18 +36,23 @@ pub fn ray_color(ray: &Ray) -> Vec3<f64> {
 }
 
 
-pub fn hit_sphere(center: &Vec3<f64>, radius: f64, ray: &Ray) -> bool {
+pub fn hit_sphere(center: &Vec3<f64>, radius: f64, ray: &Ray) -> f64{
     // nahhhh, imma do it my own way
 
     let oc = center - ray.origin();
     let unit_ray_direction = ray.direction().normalize();
 
     let a = unit_ray_direction.dot(&unit_ray_direction);
-    let b = -2.0 * oc.dot(&unit_ray_direction);
+    // let b = -2.0 * oc.dot(&unit_ray_direction);
+    let h = oc.dot(&unit_ray_direction);
     let c = oc.dot(&oc) - radius * radius;
-    let discriminant = b * b - 4.0 * a * c;
+    let discriminant = h * h -  a * c;
 
-    discriminant >= 0.0
+    if discriminant < 0.0 {
+        -1.0 // No intersection
+    }else{
+        h - discriminant.sqrt() / a // Return the distance to the intersection point 
+    }
 
 
 }
