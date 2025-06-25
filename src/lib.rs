@@ -4,10 +4,14 @@ use std::io::Write;
 pub mod core;
 pub mod color;
 pub mod ray;
+pub mod hittable;
+pub mod sphere;
 
 pub use core::Vec3;
 pub use color::write_color;
 pub use ray::Ray;
+pub use hittable::Hittable;
+pub use sphere::Sphere;
 
 pub fn write_to_file(filename: &str, data: &str) {
     let mut file = File::create(filename).expect("Unable to create file");
