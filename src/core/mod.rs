@@ -212,16 +212,6 @@ impl<T: std::fmt::Display> std::fmt::Display for Vec3<T> {
     }
 }
 
-// create a copy without a move of the original Vec3, it should be cheap
-impl <T: Copy> Vec3<T> {
-    pub fn copy(&self) -> Self {
-        Vec3 {
-            x: self.x,
-            y: self.y,
-            z: self.z,
-        }
-    }
-}
 
 impl<T: PartialEq> PartialEq for Vec3<T> {
     fn eq(&self, other: &Self) -> bool {
