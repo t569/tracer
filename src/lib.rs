@@ -8,6 +8,7 @@ pub mod hittable;
 pub mod sphere;
 pub mod hittable_list;
 pub mod interval;
+pub mod camera;
 
 pub use core::{Vec3, INFINITY, PI};
 pub use color::write_color;
@@ -17,6 +18,7 @@ pub use hittable::HitRecord;
 pub use sphere::Sphere;
 pub use hittable_list::HittableList;
 pub use interval::Interval;
+pub use camera::Camera;
 
 
 // util functions
