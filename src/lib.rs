@@ -7,6 +7,7 @@ pub mod ray;
 pub mod hittable;
 pub mod sphere;
 pub mod hittable_list;
+pub mod interval;
 
 pub use core::Vec3;
 pub use color::write_color;
@@ -15,10 +16,8 @@ pub use hittable::Hittable;
 pub use hittable::HitRecord;
 pub use sphere::Sphere;
 pub use hittable_list::HittableList;
+pub use interval::Interval;
 
-// some global constants
-const INFINITY: f64 = f64::INFINITY;
-const PI: f64 = 3.1415926535897932385;
 
 // util functions
 pub fn degrees_to_radians(degrees: f64) -> f64{

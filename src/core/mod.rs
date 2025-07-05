@@ -1,3 +1,8 @@
+// some global constants
+pub const INFINITY: f64 = f64::INFINITY;
+pub const PI: f64 = 3.1415926535897932385;
+
+
 #[derive(Debug, Clone, Copy)]
 pub struct Vec3<T>{
     x: T,
@@ -246,7 +251,7 @@ impl Vec3<f64> {
     {
         a.x * b.x + a.y * b.y + a.z * b.z
     }
-    
+
     pub fn cross(&self, other: &Self) -> Self {
         Vec3 {
             x: self.y * other.z - self.z * other.y,
