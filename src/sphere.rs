@@ -7,32 +7,43 @@ pub struct Sphere {
     radius: f64,
 }
 
+impl Sphere{
+    pub fn new(center: Vec3<f64>, radius: f64) -> Self{
+        Self{center, radius}
+    }
+}
 // remember to use Hittable trait in code, we import  it from hittable.rs
 impl Hittable for Sphere{
     fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord)-> bool {
-        let oc = ray.origin() - &self.center;
-        let a = ray.direction().dot(ray.direction());
-        let h = oc.dot(ray.direction());
-        let c = oc.dot(&oc) - self.radius * self.radius;
-        let discriminant = h * h - a * c;
+       
+        let oc = &self.center - ray.origin();
 
-        if discriminant < 0.0 {
+
+        let a = ray.direction().dot(ray.direction());
+        let c = oc.dot(&oc) - self.radius * self.radius;
+        let h = ray.direction().dot(&oc);
+        let h_discriminant = h * h - a * c;
+
+        if h_discriminant < 0.0 {
             return false; // No intersection
         }
 
-        let sqrt_d = discriminant.sqrt();
-        let root = (h - sqrt_d) / a;
+        let sqrt_d = h_discriminant.sqrt();
+        let mut root = (h - sqrt_d) / a;
 
-        if root < t_min || root > t_max {
-            return false; // Intersection not in range
+        if root <= t_min || root >= t_max {
+            root = (h + sqrt_d)/a;
+            if root <= t_min || t_max <= root
+            {
+                return false; // Intersection not in range
+            }
         }
-
         hit_record.t = root;
         hit_record.point = ray.at(root);
 
         // Calculate the normal at the intersection point
-        hit_record.normal = (hit_record.point - self.center).normalize();
-
+        let  outward_normal = (hit_record.point - self.center)/self.radius ;
+        hit_record.set_face_normal(&ray, &outward_normal);
         true
     }
 }

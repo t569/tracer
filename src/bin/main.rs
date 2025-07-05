@@ -1,7 +1,9 @@
-use tracer::write_to_file;
+use tracer::{write_to_file, Sphere};
 use tracer::core::Vec3;
 use tracer::color::write_color;
+use tracer::hittable_list::HittableList;
 use std::cmp::Ordering;
+use std::rc::Rc;
 fn main() {
     
     // IMAGE
@@ -24,6 +26,19 @@ fn main() {
         _ => image_height,   // Keep the original height if it's greater than or equal to 1
     };
 
+    // WORLD/SCENE
+    let mut world = HittableList::new();
+    world.add(Rc::new(
+        Sphere::new(Vec3::new(0.0,0.0,-1.0), 0.5)
+    ));
+     world.add(Rc::new(
+        Sphere::new(Vec3::new(0.0,-100.5,-1.0), 100.0)
+    ));
+
+
+
+
+    // CAMERA
     // finally our camera
 
 
@@ -100,7 +115,7 @@ fn main() {
             let ray = tracer::Ray::new(camera_centre, pixel_centre - camera_centre);
 
             // finally the color
-            let pixel_color = tracer::ray_color(&ray);
+            let pixel_color = tracer::ray_color(&ray, &world);
             image_data.push_str(&write_color(&pixel_color, 1));
 
         }

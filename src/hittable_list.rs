@@ -56,6 +56,8 @@ impl Hittable for HittableList
                 // this is to prevent dangling references
                 *hit_record = temp_rec.clone();
             }
+
+            
         }
 
 

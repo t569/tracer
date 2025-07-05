@@ -22,6 +22,7 @@ impl<T> Vec3<T> {
     pub fn z(&self) -> &T {
         &self.z
     }
+
 }
 
 impl<T: Default> Vec3<T> {
@@ -241,6 +242,11 @@ impl Vec3<f64> {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
+    pub fn dot_explicit(a: &Self, b: &Self) -> f64
+    {
+        a.x * b.x + a.y * b.y + a.z * b.z
+    }
+    
     pub fn cross(&self, other: &Self) -> Self {
         Vec3 {
             x: self.y * other.z - self.z * other.y,
@@ -273,7 +279,6 @@ impl Vec3<f64> {
 
 }
 
-
 // the junk code lives!!!
 impl std::ops::Mul<Vec3<f64>> for f64{
     type Output = Vec3<f64>;
@@ -287,3 +292,5 @@ impl std::ops::Mul<Vec3<f64>> for f64{
     }
 
 }
+
+
