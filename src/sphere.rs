@@ -1,5 +1,6 @@
 use crate::core::Vec3;
 use crate::hittable::{Hittable, HitRecord};
+use crate::interval::Interval;
 use crate::ray::Ray;
 
 pub struct Sphere {
@@ -14,7 +15,7 @@ impl Sphere{
 }
 // remember to use Hittable trait in code, we import  it from hittable.rs
 impl Hittable for Sphere{
-    fn hit(&self, ray: &Ray, t_min: f64, t_max: f64, hit_record: &mut HitRecord)-> bool {
+    fn hit(&self, ray: &Ray,interval: &Interval, hit_record: &mut HitRecord)-> bool {
        
         let oc = &self.center - ray.origin();
 
@@ -31,13 +32,16 @@ impl Hittable for Sphere{
         let sqrt_d = h_discriminant.sqrt();
         let mut root = (h - sqrt_d) / a;
 
-        if root <= t_min || root >= t_max {
+        if !interval.surrounds(root)
+        {
             root = (h + sqrt_d)/a;
-            if root <= t_min || t_max <= root
+
+            if !interval.surrounds(root)
             {
-                return false; // Intersection not in range
+                return false;
             }
         }
+        
         hit_record.t = root;
         hit_record.point = ray.at(root);
 

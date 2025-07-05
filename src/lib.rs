@@ -51,7 +51,7 @@ pub fn ray_color(ray: &Ray, world: &impl Hittable) -> Vec3<f64> {
 
     let mut hit_record = HitRecord::default();
 
-    if world.hit(ray, 0.0, INFINITY, &mut hit_record)
+    if world.hit(ray, &Interval::new(0.0, INFINITY), &mut hit_record)
     {
         return 0.5 * (hit_record.normal + Vec3::new(1.0, 1.0, 1.0));
     }
