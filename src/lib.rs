@@ -9,7 +9,7 @@ pub mod sphere;
 pub mod hittable_list;
 pub mod interval;
 
-pub use core::Vec3;
+pub use core::{Vec3, INFINITY, PI};
 pub use color::write_color;
 pub use ray::Ray;
 pub use hittable::Hittable;
