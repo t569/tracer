@@ -1,6 +1,10 @@
+use std::rc::Rc;
+
+use crate::material::DefaultMaterial;
 use crate::ray::Ray;
 use crate::core::Vec3;
 use crate::interval::Interval;
+use crate::Material;
 
 
 pub trait Hittable {
@@ -11,6 +15,7 @@ pub trait Hittable {
 pub struct HitRecord {
     pub t: f64,
     pub point: Vec3<f64>,
+    pub mat: Rc<dyn Material>,
     pub normal: Vec3<f64>,
     pub front_face: bool,   // specify if the normal is in the direction of the ray
 }
@@ -36,6 +41,7 @@ impl HitRecord{
         let def_vec = Vec3::new(0.0, 0.0, 0.0);
         Self { t: 0.0,
             point: def_vec,
+            mat: Rc::new(DefaultMaterial{}),
             normal:def_vec,
             front_face: true // by default point against the ray?
         }
