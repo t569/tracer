@@ -322,6 +322,11 @@ impl Vec3<f64> {
         Vec3::new(random_float_interval(min, max), random_float_interval(min, max), random_float_interval(min, max))
     }
 
+    pub fn near_zero(&self) -> bool{
+        let s = 1e-8;
+        self.x.abs() < s && self.y.abs() < s && self.z.abs() < s
+    }
+
 
 }
 
