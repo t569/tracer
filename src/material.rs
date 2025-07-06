@@ -1,5 +1,6 @@
 use crate::{Ray, HitRecord, core::Vec3};
 
+// personally feel there should be a universal materical class fr
 
 // this defines an abstract class for objects behaviours with light
 pub trait Material 
@@ -8,7 +9,6 @@ pub trait Material
     {
         false
     }
-
 }
 
 // this is for default value impl, im only using this to compile
@@ -23,14 +23,16 @@ impl Material for DefaultMaterial{
 // albedo defines a sort of fractional reflectance, the percentage of rays reflected/absorbed off a body
 pub struct Lambertian
 {
-    albedo: Vec3<f64>
+    albedo: Vec3<f64>,
 }
 
 impl Lambertian
 {
-    pub fn new(&mut self, albedo: &Vec3<f64>)
+    pub fn new(albedo: Vec3<f64>) -> Self
     {
-        self.albedo = *albedo;
+        Self{
+            albedo: albedo
+        }
     }
 }
 
@@ -50,6 +52,31 @@ impl Material for Lambertian
         true
     }
 }
+
+pub struct Metal
+{
+    albedo: Vec3<f64>,
+}
+
+impl Metal
+{
+    pub fn new(albedo: Vec3<f64>) -> Self
+    {
+        Self {albedo: albedo}
+    }
+}
+
+impl Material for Metal
+{
+    fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord, attenuation: &mut Vec3<f64>, scattered: &mut Ray) -> bool {
+        let reflected = Vec3::reflect(ray_in.direction(), &hit_record.normal);
+        *scattered = Ray::new(hit_record.point, reflected);
+        *attenuation = self.albedo.clone();
+        true
+    }
+}
+
+
 
 
 

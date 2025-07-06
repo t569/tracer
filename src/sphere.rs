@@ -2,15 +2,21 @@ use crate::core::Vec3;
 use crate::hittable::{Hittable, HitRecord};
 use crate::interval::Interval;
 use crate::ray::Ray;
+use crate::Material;
+
+use std::rc::Rc;
 
 pub struct Sphere {
     center: Vec3<f64>,
     radius: f64,
+    mat: Rc<dyn Material>
 }
 
 impl Sphere{
-    pub fn new(center: Vec3<f64>, radius: f64) -> Self{
-        Self{center, radius}
+    pub fn new(center: Vec3<f64>, radius: f64, mat: Rc<dyn Material>) -> Self{
+        Self{center, radius, mat}
+
+        // TODO: initialise the material pointer here
     }
 }
 // remember to use Hittable trait in code, we import  it from hittable.rs
@@ -48,6 +54,9 @@ impl Hittable for Sphere{
         // Calculate the normal at the intersection point
         let  outward_normal = (hit_record.point - self.center)/self.radius ;
         hit_record.set_face_normal(&ray, &outward_normal);
+
+        // clone the smart pointer: increase the reference count
+        hit_record.mat = Rc::clone(&self.mat);
         true
     }
 }
