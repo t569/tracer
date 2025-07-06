@@ -1,4 +1,4 @@
-use crate::{hittable::{self, HitRecord, Hittable}, random_float, ray_color, Ray, INFINITY};
+use crate::{hittable::{self, HitRecord, Hittable}, random_float, Ray, INFINITY};
 use crate::core::Vec3;
 use crate::interval::Interval;
 use crate::color::write_color;
@@ -8,6 +8,7 @@ pub struct Camera{
     pub aspect_ratio: f64,
     pub image_width: u32,
     pub samples_per_pixel: u32,
+    pub max_depth: u32,             // max number of ray bounces in ray color function
 
     // private fields
     image_height: u32,              // Rendered image height
@@ -27,6 +28,7 @@ impl Camera{
             aspect_ratio: 0.0,
             image_width: 0,
             samples_per_pixel: 1,
+            max_depth: 10,
             centre: Vec3::origin(),
             image_height: 0,
             pixel_samples_scale: 0.5,
@@ -54,10 +56,10 @@ impl Camera{
 
                 let mut pixel_color = Vec3::origin();
 
-                for k in 0..self.samples_per_pixel
+                for _k in 0..self.samples_per_pixel
                 {
                     let r = self.get_ray(i, j);
-                    pixel_color += ray_color(&r, world);
+                    pixel_color += Self::ray_color(&r,self.max_depth, world);
                 }
                 image_data.push_str(&write_color(&(pixel_color * self.pixel_samples_scale)));
 
@@ -69,14 +71,25 @@ impl Camera{
 
     }
 
-    fn ray_color(ray: &Ray, world: &impl Hittable) -> Vec3<f64>
+    fn ray_color(ray: &Ray, depth: u32, world: &impl Hittable) -> Vec3<f64>
     {
+        // if depth is zero, return black to avoid infinite bounces
+        if depth <= 0
+        {
+            return Vec3::origin();
+        }
         let mut hit_record = HitRecord::default();
 
+
+        // if we hit something, generate a new ray in a random direction and trace where it goes and do this recursively
         if world.hit(ray, &Interval::new(0.0, INFINITY), &mut hit_record)
         {
-            return 0.5 * (hit_record.normal + Vec3::new(1.0, 1.0, 1.0));
+            // put the vectors on the right hemisphere
+            let direction = Vec3::random_on_hemisphere(&hit_record.normal);
+            return 0.5 * Self::ray_color(&Ray::new(hit_record.point, direction),depth - 1, world);
         }
+
+
         let unit_direction = ray.direction().normalize();
         let t = 0.5 * (unit_direction.y() + 1.0);
         Vec3::new(

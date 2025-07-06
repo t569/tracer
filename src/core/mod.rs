@@ -1,3 +1,5 @@
+use crate::{random_float, random_float_interval};
+
 // some global constants
 pub const INFINITY: f64 = f64::INFINITY;
 pub const PI: f64 = 3.1415926535897932385;
@@ -279,6 +281,45 @@ impl Vec3<f64> {
         } else {
             Vec3::default()
         }
+    }
+
+    pub fn random_unit_vector() -> Self{
+
+        // keep generating vectors in range [-1, 1] if it lies outside the sphere, but in the rectangle, generate a new one
+        loop {
+            let p = Vec3::random_range_vec3(-1.0, 1.0);
+            let lensq = p.dot(&p);
+
+            // black hole condition: to prevent blowing up of really small vectors when normalised
+            if lensq <= 1.0 && 1e-160 < lensq
+            {
+                return p / lensq.sqrt();
+            }
+        }
+    }
+
+    pub fn random_on_hemisphere(normal: &Vec3<f64>) -> Vec3<f64>
+    {
+        let on_unit_sphere = Self::random_unit_vector();
+        if Self::dot_explicit(&on_unit_sphere, normal) > 0.0
+        {
+            on_unit_sphere
+        }
+        else {
+            -on_unit_sphere
+        }
+
+    }
+
+    // generate random Vec3s
+    pub fn random_vec3() -> Vec3<f64>
+    {
+        Vec3::new(random_float(), random_float(), random_float())
+    }
+
+    pub fn random_range_vec3(min: f64, max: f64) -> Vec3<f64>
+    {
+        Vec3::new(random_float_interval(min, max), random_float_interval(min, max), random_float_interval(min, max))
     }
 
 

@@ -42,41 +42,41 @@ pub fn write_to_file(filename: &str, data: &str) {
     file.write_all(data.as_bytes()).expect("Unable to write data");
 }
 
-pub fn ray_color(ray: &Ray, world: &impl Hittable) -> Vec3<f64> {
-    // // Simple ray color function that returns a gradient based on the ray's direction
-    // let centre = Vec3::new(0.0, 0.0, -1.0);
+// pub fn ray_color(ray: &Ray, world: &impl Hittable) -> Vec3<f64> {
+//     // // Simple ray color function that returns a gradient based on the ray's direction
+//     // let centre = Vec3::new(0.0, 0.0, -1.0);
 
-    // let t = hit_sphere(&centre, 0.5, ray);
+//     // let t = hit_sphere(&centre, 0.5, ray);
 
-    // if t > 0.0{
-    //     let normal = (ray.at(t) - centre).normalize();
-    //     return 0.5 * Vec3::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
-    // }
+//     // if t > 0.0{
+//     //     let normal = (ray.at(t) - centre).normalize();
+//     //     return 0.5 * Vec3::new(normal.x() + 1.0, normal.y() + 1.0, normal.z() + 1.0);
+//     // }
 
-    // let unit_direction = ray.direction().normalize();
+//     // let unit_direction = ray.direction().normalize();
 
-    // let t = 0.5 * (unit_direction.y() + 1.0);
-    // Vec3::new(
-    //     (1.0 - t) * 1.0 + t * 0.5, // Interpolating between white and light blue
-    //     (1.0 - t) * 1.0 + t * 0.7, // Interpolating between white and light blue
-    //     (1.0 - t) * 1.0 + t * 1.0, // Interpolating between white and light blue
-    // )
+//     // let t = 0.5 * (unit_direction.y() + 1.0);
+//     // Vec3::new(
+//     //     (1.0 - t) * 1.0 + t * 0.5, // Interpolating between white and light blue
+//     //     (1.0 - t) * 1.0 + t * 0.7, // Interpolating between white and light blue
+//     //     (1.0 - t) * 1.0 + t * 1.0, // Interpolating between white and light blue
+//     // )
 
-    let mut hit_record = HitRecord::default();
+//     let mut hit_record = HitRecord::default();
 
-    if world.hit(ray, &Interval::new(0.0, INFINITY), &mut hit_record)
-    {
-        return 0.5 * (hit_record.normal + Vec3::new(1.0, 1.0, 1.0));
-    }
-    let unit_direction = ray.direction().normalize();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-    Vec3::new(
-        (1.0 - t) * 1.0 + t * 0.5, // Interpolating between white and light blue
-        (1.0 - t) * 1.0 + t * 0.7, // Interpolating between white and light blue
-        (1.0 - t) * 1.0 + t * 1.0, // Interpolating between white and light blue
-    )
+//     if world.hit(ray, &Interval::new(0.0, INFINITY), &mut hit_record)
+//     {
+//         return 0.5 * (hit_record.normal + Vec3::new(1.0, 1.0, 1.0));
+//     }
+//     let unit_direction = ray.direction().normalize();
+//     let t = 0.5 * (unit_direction.y() + 1.0);
+//     Vec3::new(
+//         (1.0 - t) * 1.0 + t * 0.5, // Interpolating between white and light blue
+//         (1.0 - t) * 1.0 + t * 0.7, // Interpolating between white and light blue
+//         (1.0 - t) * 1.0 + t * 1.0, // Interpolating between white and light blue
+//     )
 
-}
+// }
 
 pub fn hit_sphere(center: &Vec3<f64>, radius: f64, ray: &Ray) -> f64{
 
