@@ -90,6 +90,53 @@ impl Material for Metal
     }
 }
 
+pub struct Dielectric
+{
+    refraction_index: f64,
+}
+
+impl Dielectric
+{
+    pub fn new(refract_index: f64) -> Self
+    {
+        Self{refraction_index: refract_index}
+    }
+}
+
+impl Material for Dielectric
+{
+    fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord, attenuation: &mut Vec3<f64>, scattered: &mut Ray) -> bool {
+        // this is always 1, the surface absorbs nothing
+        *attenuation = Vec3::new(1.0, 1.0, 1.0);
+
+        // this is based on the change of perspective based on what medium we are in
+        let ref_index = match hit_record.front_face {
+            true => 1.0/self.refraction_index,
+            false => self.refraction_index,
+        };
+
+        let unit_direction = ray_in.direction().normalize();
+
+        // the angles being computed
+        let cos_theta = Vec3::dot_explicit(&-unit_direction, &hit_record.normal);
+        let sin_theta = (1.0 - cos_theta*cos_theta).sqrt();
+
+        // this is for total internal reflection
+        let cannot_refract = ref_index * sin_theta > 1.0;
+        let mut direction = Vec3::origin();
+        if cannot_refract
+        {
+            direction = Vec3::reflect(&unit_direction, &hit_record.normal);
+        }
+        else {
+            direction = Vec3::refract(&unit_direction, &hit_record.normal, ref_index);
+        }
+
+        *scattered = Ray::new(hit_record.point, direction);
+        true
+    }
+}
+
 
 
 

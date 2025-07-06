@@ -1,4 +1,4 @@
-use tracer::material::{Lambertian, Metal};
+use tracer::material::{Dielectric, Lambertian, Metal};
 use tracer::{Camera, Sphere};
 use tracer::core::Vec3;
 use tracer::hittable_list::HittableList;
@@ -18,8 +18,8 @@ fn main() {
     ));
     
     let material_left = Rc::new(
-        Metal::new(Vec3::new(0.8, 0.8,0.8), 0.0
-    ));
+        Dielectric::new(1.50)   // value of glass refraction index
+    );
 
     let material_right = Rc::new(
         Metal::new(Vec3::new(0.8, 0.6,0.2), 1.0

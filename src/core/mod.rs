@@ -333,6 +333,15 @@ impl Vec3<f64> {
         v - &(2.0 * Vec3::dot_explicit(v, n) * (*n))
     }
 
+    pub fn refract(uv: &Vec3<f64>, n: &Vec3<f64>, etai_over_etat: f64) -> Vec3<f64>
+    {
+        let cos_theta = Vec3::dot_explicit(&-uv, &n).min(1.0);
+        let r_out_perpendicular = etai_over_etat * *(&(*uv + (n * cos_theta))); // dont consider the nonsense syntax here smh
+        let r_out_parallel = - ((1.0 - r_out_perpendicular.dot(&r_out_perpendicular)).abs().sqrt() * *n);
+
+        r_out_parallel + r_out_perpendicular
+    }
+
 
 }
 
