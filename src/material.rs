@@ -56,23 +56,37 @@ impl Material for Lambertian
 pub struct Metal
 {
     albedo: Vec3<f64>,
+    fuzz: f64,
 }
 
 impl Metal
 {
-    pub fn new(albedo: Vec3<f64>) -> Self
+    pub fn new(albedo: Vec3<f64>, fuzz: f64) -> Self
     {
-        Self {albedo: albedo}
+        // this implements a sphere which causes displacement of the reflection vectors
+        let fuzz = match fuzz < 1.0 {
+            true => 1.0,
+            false => fuzz
+        };
+        Self {albedo: albedo, fuzz: fuzz}
     }
 }
 
 impl Material for Metal
 {
     fn scatter(&self, ray_in: &Ray, hit_record: &HitRecord, attenuation: &mut Vec3<f64>, scattered: &mut Ray) -> bool {
-        let reflected = Vec3::reflect(ray_in.direction(), &hit_record.normal);
+        let mut reflected = Vec3::reflect(ray_in.direction(), &hit_record.normal);
+
+
+        // implement the fuzzing of the rays.
+        // we need to scale (to unit vector) each fuzz sphere to be consistent when compared with the reflection vector
+        reflected = reflected.normalize() + (self.fuzz * Vec3::random_unit_vector());
+
         *scattered = Ray::new(hit_record.point, reflected);
         *attenuation = self.albedo.clone();
-        true
+
+        // if we are scatter below thw surface because of a big sphere or a surface ray, simply absorb it
+        hit_record.normal.dot(&scattered.direction()) > 0.0
     }
 }
 

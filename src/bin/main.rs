@@ -18,11 +18,11 @@ fn main() {
     ));
     
     let material_left = Rc::new(
-        Metal::new(Vec3::new(0.8, 0.8,0.8)
+        Metal::new(Vec3::new(0.8, 0.8,0.8), 0.3
     ));
 
     let material_right = Rc::new(
-        Metal::new(Vec3::new(0.8, 0.6,0.2)
+        Metal::new(Vec3::new(0.8, 0.6,0.2), 1.0
     ));
 
 
