@@ -86,9 +86,18 @@ impl Camera{
         // it is not set at 0.0 but at 0.0001 to prevent shadow acne (near hits)
         if world.hit(ray, &Interval::new(0.0001, INFINITY), &mut hit_record)
         {
-            // Lambertian distribution
-            let direction = hit_record.normal + Vec3::random_unit_vector();
-            return 0.5 * Self::ray_color(&Ray::new(hit_record.point, direction),depth - 1, world);
+            let mut attenuation = Vec3::origin();
+            // ray scattered;
+            let mut scattered = Ray::new(Vec3::origin(), Vec3::origin());
+
+            if hit_record.mat.scatter(ray, &hit_record, &mut attenuation, &mut scattered)
+            {
+                return attenuation * Self::ray_color(&scattered, depth - 1, world);
+            }
+
+            
+            // this is synonymous to black
+            return Vec3::origin();
         }
 
 
