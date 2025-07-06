@@ -82,10 +82,12 @@ impl Camera{
 
 
         // if we hit something, generate a new ray in a random direction and trace where it goes and do this recursively
-        if world.hit(ray, &Interval::new(0.0, INFINITY), &mut hit_record)
+
+        // it is not set at 0.0 but at 0.0001 to prevent shadow acne (near hits)
+        if world.hit(ray, &Interval::new(0.0001, INFINITY), &mut hit_record)
         {
-            // put the vectors on the right hemisphere
-            let direction = Vec3::random_on_hemisphere(&hit_record.normal);
+            // Lambertian distribution
+            let direction = hit_record.normal + Vec3::random_unit_vector();
             return 0.5 * Self::ray_color(&Ray::new(hit_record.point, direction),depth - 1, world);
         }
 
