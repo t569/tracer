@@ -327,6 +327,12 @@ impl Vec3<f64> {
         self.x.abs() < s && self.y.abs() < s && self.z.abs() < s
     }
 
+    // reflection of the an incident ray on a surface
+    pub fn reflect(v: &Vec3<f64>, n: &Vec3<f64>) -> Vec3<f64>
+    {
+        v - &(2.0 * Vec3::dot_explicit(v, n) * (*n))
+    }
+
 
 }
 
@@ -342,6 +348,21 @@ impl std::ops::Mul<Vec3<f64>> for f64{
         }
     }
 
+}
+
+// for attenuation
+impl std::ops::Mul for Vec3<f64>
+{
+    type Output = Vec3<f64>;
+
+    fn mul(self, rhs: Vec3<f64>) -> Vec3<f64>
+    {
+        Vec3::new(
+            self.x() * rhs.x(),
+            self.y() * rhs.y(),
+            self.z() * rhs.z()
+        )
+    }
 }
 
 
