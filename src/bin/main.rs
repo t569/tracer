@@ -18,7 +18,7 @@ fn main() {
     ));
     
     let material_left = Rc::new(
-        Metal::new(Vec3::new(0.8, 0.8,0.8), 0.3
+        Metal::new(Vec3::new(0.8, 0.8,0.8), 0.0
     ));
 
     let material_right = Rc::new(
@@ -26,7 +26,7 @@ fn main() {
     ));
 
 
-
+    // TODO: add a gamma correction toggle
    
     world.add(Rc::new(
         Sphere::new(Vec3::new(0.0,-100.5,-1.0), 100.0, material_ground)

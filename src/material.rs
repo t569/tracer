@@ -65,8 +65,8 @@ impl Metal
     {
         // this implements a sphere which causes displacement of the reflection vectors
         let fuzz = match fuzz < 1.0 {
-            true => 1.0,
-            false => fuzz
+            true => fuzz,
+            false => 1.0
         };
         Self {albedo: albedo, fuzz: fuzz}
     }
