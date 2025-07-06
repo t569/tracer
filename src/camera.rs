@@ -1,4 +1,4 @@
-use crate::{hittable::{self, Hittable, HitRecord}, Ray, INFINITY};
+use crate::{hittable::{self, HitRecord, Hittable}, random_float, ray_color, Ray, INFINITY};
 use crate::core::Vec3;
 use crate::interval::Interval;
 use crate::color::write_color;
@@ -7,13 +7,15 @@ use std::cmp::Ordering;
 pub struct Camera{
     pub aspect_ratio: f64,
     pub image_width: u32,
+    pub samples_per_pixel: u32,
 
     // private fields
-    image_height: u32,
-    centre: Vec3<f64>,
-    pixel_00_origin_loc: Vec3<f64>,
-    pixel_delta_u: Vec3<f64>,
-    pixel_delta_v: Vec3<f64>,
+    image_height: u32,              // Rendered image height
+    pixel_samples_scale: f64,       // Color scale factor for a sum of pixel samples
+    centre: Vec3<f64>,              // Camera center
+    pixel_00_origin_loc: Vec3<f64>, // Location of pixel 0,0
+    pixel_delta_u: Vec3<f64>,       // Offset to pixel to the right
+    pixel_delta_v: Vec3<f64>,       // Offset to pixel below
 }
 
 
@@ -24,8 +26,10 @@ impl Camera{
         {
             aspect_ratio: 0.0,
             image_width: 0,
+            samples_per_pixel: 1,
             centre: Vec3::origin(),
             image_height: 0,
+            pixel_samples_scale: 0.5,
             pixel_00_origin_loc: Vec3::origin(),
             pixel_delta_u: Vec3::origin(),
             pixel_delta_v: Vec3::origin(),
@@ -47,26 +51,15 @@ impl Camera{
             println!("Progress: {}/{}", i, self.image_height);
 
             for j in 0..self.image_width{
-                // // Generate a pixel value based on its position
-                // let r = ((i as f32 / image_height as f32) * 255.0) as u8;
-                // let g = ((j as f32 / image_width as f32) * 255.0) as u8;
-                // let b = (0.0 * 255.0) as u8; // No blue component
-                // let r = i / (image_width - 1);
-                // let g = j / (image_height - 1);
-                // let pixel_color = Vec3::new(r as f32, g as f32, 0.0);
 
-                // get the pixel centres
+                let mut pixel_color = Vec3::origin();
 
-                // lets be sane about the implementation
-                let pixel_centre = self.pixel_00_origin_loc + (self.pixel_delta_v * i as f64) + (self.pixel_delta_u * j as f64);
-
-
-                // create a ray from the camera to the pixel centre
-                let ray = Ray::new(self.centre, pixel_centre - self.centre);
-
-                // finally the color
-                let pixel_color = Self::ray_color(&ray, world);
-                image_data.push_str(&write_color(&pixel_color, 1));
+                for k in 0..self.samples_per_pixel
+                {
+                    let r = self.get_ray(i, j);
+                    pixel_color += ray_color(&r, world);
+                }
+                image_data.push_str(&write_color(&(pixel_color * self.pixel_samples_scale)));
 
             }
         }
@@ -97,6 +90,7 @@ impl Camera{
     {
         self.image_height = (self.image_width as f64 / self.aspect_ratio) as u32;
 
+        self.pixel_samples_scale = 1.0 / self.samples_per_pixel as f64;
 
          // wtf, borrowing 1???
         self.image_height = match self.image_height.cmp(&1){
@@ -128,5 +122,24 @@ impl Camera{
         // so we can get the pixel at (0, 0) in the viewport
         self.pixel_00_origin_loc = viewport_00_origin + self.pixel_delta_u / 2.0 + self.pixel_delta_v / 2.0; 
 
+    }
+
+    fn get_ray(&self, i: u32, j: u32) -> Ray
+    {
+        let offset = Self::sample_square();
+
+        let pixel_sample = self.pixel_00_origin_loc 
+        + ((offset.x() + (i as f64)) * self.pixel_delta_v)
+        + ((offset.y() + (j as f64)) * self.pixel_delta_u);
+
+        let ray_origin = self.centre;
+        let ray_direction = pixel_sample - ray_origin;
+
+        Ray::new(ray_origin, ray_direction)
+    }
+
+    fn sample_square() -> Vec3<f64>{
+        // return a random point in the [-0.5, -0.5] [0.5, 0.5] square
+        Vec3::new(random_float() - 0.5, random_float() - 0.5, 0.0)
     }
 }

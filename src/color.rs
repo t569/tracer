@@ -1,7 +1,7 @@
-use crate::core::Vec3;
+use crate::{core::Vec3, Interval};
 
 
-pub fn write_color(pixel_color: &Vec3<f64>, samples_per_pixel: u32) -> String {
+pub fn write_color(pixel_color: &Vec3<f64>) -> String {
     // Scale the color by the number of samples
     // let r = (pixel_color.x() * scale).sqrt();
     // let g = (pixel_color.y() * scale).sqrt();
@@ -12,9 +12,12 @@ pub fn write_color(pixel_color: &Vec3<f64>, samples_per_pixel: u32) -> String {
     let b = pixel_color.z();
 
     // Convert to 8-bit color values
-    let r = (r * 255.999) as u8;
-    let g = (g * 255.999) as u8;
-    let b = (b * 255.999) as u8;
 
+    // make the final color values bound [0, 1] subsquently [0, 255]
+    let intensity = Interval::new(0.000, 0.999);
+    let r = (intensity.clamp(*r)* 255.999) as u8;
+    let g = (intensity.clamp(*g)* 255.999) as u8;
+    let b = (intensity.clamp(*b)* 255.999) as u8;
+    
     format!("{} {} {}\n", r, g, b)
 }

@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Write;
+use rand::Rng;
 
 pub mod core;
 pub mod color;
@@ -24,6 +25,16 @@ pub use camera::Camera;
 // util functions
 pub fn degrees_to_radians(degrees: f64) -> f64{
     degrees * PI/180.0
+}
+
+pub fn random_float() -> f64{
+    let mut rng = rand::rng();
+    rng.random_range(0..=1_000) as f64/ 1_000.0
+}
+
+pub fn random_float_interval(min: f64, max: f64) -> f64
+{
+    min + (max - min)*random_float()
 }
 
 pub fn write_to_file(filename: &str, data: &str) {
@@ -67,8 +78,8 @@ pub fn ray_color(ray: &Ray, world: &impl Hittable) -> Vec3<f64> {
 
 }
 
-
 pub fn hit_sphere(center: &Vec3<f64>, radius: f64, ray: &Ray) -> f64{
+
     // nahhhh, imma do it my own way
 
     let oc = center - ray.origin();
@@ -88,3 +99,4 @@ pub fn hit_sphere(center: &Vec3<f64>, radius: f64, ray: &Ray) -> f64{
 
 
 }
+
