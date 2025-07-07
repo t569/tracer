@@ -1,5 +1,5 @@
 use tracer::material::{Dielectric, Lambertian, Metal};
-use tracer::{Camera, Sphere};
+use tracer::{Camera, Sphere, PI};
 use tracer::core::Vec3;
 use tracer::hittable_list::HittableList;
 use std::rc::Rc;
@@ -8,6 +8,7 @@ fn main() {
     let mut world = HittableList::new();
 
 
+    let R = (PI/4 as f64).cos();
     // various materials based on the Material trait
     let material_ground = Rc::new(
         Lambertian::new(Vec3::new(0.8, 0.8,0.0)
@@ -17,15 +18,20 @@ fn main() {
         Lambertian::new(Vec3::new(0.1, 0.2,0.5)
     ));
     
-    // let material_left = Rc::new(
-    //     Dielectric::new(1.50)   // value of glass refraction index
-    // );
+    let material_left = Rc::new(
+        Dielectric::new(1.50)   // value of glass refraction index
+    );
+
+    let material_inner_bubble =  Rc::new(
+        Dielectric::new(1.00/1.50)   // value of glass refraction index of inner glass enclosing air
+    );
+
 
     // now this is a world filled with water containing an air bubble
-     let material_left = Rc::new(
-        Dielectric::new(1.00/1.33)   
-    );
-    
+    //  let material_left = Rc::new(
+    //     Dielectric::new(1.00/1.33)   
+    // );
+
     let material_right = Rc::new(
         Metal::new(Vec3::new(0.8, 0.6,0.2), 1.0
     ));
@@ -40,10 +46,14 @@ fn main() {
         Sphere::new(Vec3::new(0.0,0.0,-1.2), 0.5, material_center)
     ));
     world.add(Rc::new(
-        Sphere::new(Vec3::new(-1.0,0.0,-1.0), 0.5, material_left)
+        Sphere::new(Vec3::new(-R,0.0,-1.0), 0.5, material_left)
+    ));
+
+    world.add(Rc::new(
+        Sphere::new(Vec3::new(-R,0.0,-1.0), 0.4, material_inner_bubble)
     ));
     world.add(Rc::new(
-        Sphere::new(Vec3::new(1.0,0.0,-1.0), 0.5, material_right)
+        Sphere::new(Vec3::new(R,0.0,-1.0), 0.5, material_right)
     ));
 
     // initialise the camera
@@ -53,6 +63,7 @@ fn main() {
     camera.image_width = 400;
     camera.samples_per_pixel = 100;
     camera.max_depth = 50;
+    camera.vfov = 120 as f64;
 
     camera.render(&world);
 
