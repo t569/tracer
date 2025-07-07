@@ -1,4 +1,4 @@
-use crate::{Ray, HitRecord, core::Vec3};
+use crate::{core::Vec3, random_float, HitRecord, Ray};
 
 // personally feel there should be a universal materical class fr
 
@@ -101,6 +101,15 @@ impl Dielectric
     {
         Self{refraction_index: refract_index}
     }
+
+    // schlick approximation: glass and other dielectrics behave like mirrors at steep angles
+    fn reflectance(cosine: f64, refraction_index: f64) -> f64
+    {
+        let mut r0 = (1 as f64 - refraction_index)/ (1 as f64 + refraction_index);
+        r0 = r0 * r0;
+
+        r0 + (1 as f64 - r0) * (1 as f64 - cosine).powf(5 as f64)
+    }
 }
 
 impl Material for Dielectric
@@ -124,7 +133,9 @@ impl Material for Dielectric
         // this is for total internal reflection
         let cannot_refract = ref_index * sin_theta > 1.0;
         let mut direction = Vec3::origin();
-        if cannot_refract
+
+        // the reflectance code checks if we're in the range of numbers where reflectance can take place
+        if cannot_refract || Self::reflectance(cos_theta, ref_index) > random_float()
         {
             direction = Vec3::reflect(&unit_direction, &hit_record.normal);
         }
