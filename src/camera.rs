@@ -10,6 +10,9 @@ pub struct Camera{
     pub samples_per_pixel: u32,
     pub max_depth: u32,             // max number of ray bounces in ray color function
     pub vfov: f64,                  // vertical field of view for the camera
+    pub vup: Vec3<f64>,             // realtive up direction for our camera
+    pub lookfrom: Vec3<f64>,        // point the camera is looking from
+    pub lookat: Vec3<f64>,          // point the camera is looking at: TODO specify this as a direction: just put lookat at the centre of the screen or sm
 
     // private fields
     image_height: u32,              // Rendered image height
@@ -18,6 +21,11 @@ pub struct Camera{
     pixel_00_origin_loc: Vec3<f64>, // Location of pixel 0,0
     pixel_delta_u: Vec3<f64>,       // Offset to pixel to the right
     pixel_delta_v: Vec3<f64>,       // Offset to pixel below
+    // camera frame basis vectros
+    u: Vec3<f64>,
+    v: Vec3<f64>,
+    w: Vec3<f64>,
+
 }
 
 
@@ -31,12 +39,20 @@ impl Camera{
             samples_per_pixel: 1,
             max_depth: 10,
             vfov: 90 as f64,
+            lookfrom: Vec3::origin(),
+            lookat: Vec3::new(0.0, 0.0,-1.0),
+            vup: Vec3::new(0.0, 1.0, 0.0),
             centre: Vec3::origin(),
             image_height: 0,
             pixel_samples_scale: 0.5,
             pixel_00_origin_loc: Vec3::origin(),
             pixel_delta_u: Vec3::origin(),
             pixel_delta_v: Vec3::origin(),
+
+            // these dont do anything for now
+            u: Vec3::origin(),
+            v: Vec3::origin(),
+            w: Vec3::origin(),
         }
     }
     pub fn render(&mut self, world: & impl Hittable)
@@ -124,27 +140,35 @@ impl Camera{
             _ => self.image_height,   // Keep the original height if it's greater than or equal to 1
         };
 
-        self.centre = Vec3::origin();
+        // this is the camera centre
+        self.centre = self.lookfrom;
 
         // viewport dimensions
-        let focal_length = 1.0;
+        let focal_length = (self.lookfrom - self.lookat).mag();
         let theta = crate::degrees_to_radians(self.vfov);
         let h = (theta/ 2.0).tan();
+
+        // calculate the u, v, w unit basis  vectors for the camera coordinate frame
+        self.w = (self.lookfrom - self.lookat).normalize();
+        self.u = self.vup.cross(&self.w);
+        self.v = self.w.cross(&self.u);
+
 
         let viewport_height = 2.0 * h * focal_length;
         let viewport_width = viewport_height * (self.image_width as f64) / self.image_height as f64;
         
 
         // calculate vectors across the horizontal and down the vertical viewport edges
-        let viewport_u = Vec3::new(viewport_width, 0.0, 0.0);
-        let viewport_v = Vec3::new(0.0, -viewport_height, 0.0);
+        let viewport_u = viewport_width * self.u;
+        let viewport_v = viewport_height * -self.v;
+
 
         // calculate the horizontal and vertical delta vectors from pixel to pixel
         self.pixel_delta_u = viewport_u / self.image_width as f64;
         self.pixel_delta_v = viewport_v/ self.image_height as f64;
 
         // calculate the location of the upper left pixel
-        let viewport_00_origin = self.centre - viewport_u / 2.0 - viewport_v / 2.0 - Vec3::new(0.0, 0.0, focal_length);
+        let viewport_00_origin = self.centre - (self.w * focal_length)- viewport_u / 2.0 - viewport_v / 2.0;
     
         // the offset of the first point is half the distance of the delta vectors
         // this is to center the first pixel in the viewport
