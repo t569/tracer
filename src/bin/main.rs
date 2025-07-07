@@ -26,10 +26,6 @@ fn main() {
         Dielectric::new(1.00/1.50)   // value of glass refraction index of inner glass enclosing air
     );
 
-    let material_right =  Rc::new(
-        Metal::new(Vec3::new(0.8, 0.6, 0.2), 1.0)   // value of glass refraction index of inner glass enclosing air
-    );
-
 
     // now this is a world filled with water containing an air bubble
     //  let material_left = Rc::new(
@@ -74,6 +70,8 @@ fn main() {
     camera.lookat = Vec3::new(0.0, 0.0, -1.0);
     camera.vup = Vec3::new(0.0, 1.0, 0.0);
 
+    camera.defocus_angle = 10.0;
+    camera.focus_dist = 3.4;
 
     camera.render(&world);
 

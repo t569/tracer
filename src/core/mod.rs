@@ -282,7 +282,15 @@ impl Vec3<f64> {
             Vec3::default()
         }
     }
-
+    pub fn random_in_unit_disk() -> Vec3<f64>
+    {
+        loop{
+            let p = Vec3::new(crate::random_float_interval(-1.0,1.0), random_float_interval(-1.0, 1.0), 0.0);
+            if p.dot(&p) < 1.0{
+                return p;
+            }
+        }
+    }
     pub fn random_unit_vector() -> Self{
 
         // keep generating vectors in range [-1, 1] if it lies outside the sphere, but in the rectangle, generate a new one
