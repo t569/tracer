@@ -22,6 +22,10 @@ pub use hittable_list::HittableList;
 pub use interval::Interval;
 pub use camera::Camera;
 pub use material::Material;
+pub use material::DefaultMaterial;
+pub use material::Dielectric;
+pub use material::Lambertian;
+pub use material::Metal;
 
 
 // util functions
